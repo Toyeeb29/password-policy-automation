@@ -156,7 +156,7 @@ aws iam update-account-password-policy \
   --profile Toyeeb
 ```
 # Run the checker
-```python password_policy_checker.py --profile Toyeeb
+python password_policy_checker.py --profile Toyeeb
 ```
 ---
 ## Sample non-compliance output
@@ -169,13 +169,15 @@ aws iam update-account-password-policy \
 
 ## 📁 Generated Reports
 
-Each run produces two output files:
+Each run produces two output files for both compliant and non-compliant password policy:
 
 | File | Format | Purpose |
 |------|--------|---------|
 | `password_policy_compliance_report.json` | JSON | Detailed technical report for engineers |
 | `password_policy_compliance_summary.csv` | CSV | Audit-ready summary for compliance teams |
 
+| File | Format | Purpose |
+|------|--------|---------|
 | `password_policy_non-compliance_report.json` | JSON | Detailed technical report for engineers |
 | `password_policy_non-compliance_summary.csv` | CSV | Audit-ready summary for compliance teams |
 
