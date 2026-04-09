@@ -1,108 +1,74 @@
-# Lab 1: Password Policy Verification
+# 🔐 AWS Password Policy Compliance Checker
 
-## Overview
+A Python-based GRC automation tool that validates AWS account password policies against **SOC 2 CC6.2** and **NIST 800-53 IA-5** compliance standards. Built as part of my hands-on GRC engineering lab series.
 
-This lab teaches GRC engineers how to validate AWS account password policies using Python to ensure compliance with identity management requirements. You'll learn to programmatically assess whether your organization's password policies meet SOC 2 and NIST standards, with intelligent detection of both traditional IAM and AWS Identity Center authentication scenarios.
+---
 
-## Why This Matters
+## 📌 What This Does
 
-Password policies are foundational to identity security. Auditors frequently request evidence that password complexity, length, and rotation requirements are properly configured. This lab automates the collection of that evidence and adapts to modern federated authentication architectures.
+This tool connects to your AWS account, retrieves your IAM password policy, and evaluates it against industry compliance standards. It automatically detects whether your account uses traditional IAM, AWS Identity Center (SSO), or a hybrid setup — and generates audit-ready reports accordingly.
 
-## Control Mapping
+---
 
-- **SOC 2 CC6.2** – Logical access security measures
-- **NIST 800-53 IA-5** – Authenticator management
+## 🎯 Control Mapping
 
-## Learning Objectives
+| Framework | Control | Description |
+|-----------|---------|-------------|
+| SOC 2 | CC6.2 | Logical access security measures |
+| NIST 800-53 | IA-5 | Authenticator management |
 
-By completing this lab, you will:
+---
 
-1. Query AWS IAM account password policies programmatically
-2. Detect and handle AWS Identity Center (federated) authentication
-3. Map technical evidence to compliance requirements
-4. Generate audit-ready documentation for different authentication scenarios
-5. Understand password policy best practices for compliance
+## 🛠️ Tech Stack
 
-## Prerequisites
+- **Python 3.9+**
+- **boto3** – AWS SDK for Python
+- **AWS IAM** – Password policy evaluation
+- **AWS IAM Identity Center** – SSO detection
+- **AWS STS** – Account identity verification
 
-- AWS CLI configured with appropriate permissions
-- Python 3.9+ installed
-- Basic familiarity with AWS IAM and Identity Center
-- Understanding of virtual environments
-- Windsurf IDE (download at: https://windsurf.com/refer?referral_code=l8ckp786a0dhgm96)
+---
 
-## Lab Setup Guide
+## ⚙️ Setup
 
-### Step 1: Download and Setup Lab Files
-
-1. **Download the lab files** from the provided ZIP archive
-2. **Extract the ZIP file** to a new folder on your local machine (e.g., `GRC_Labs`)
-3. **Open Windsurf IDE** and create a new workspace
-4. **Open the lab folder** in Windsurf IDE:
-   ```
-   File → Open Folder → Navigate to extracted folder → 
-   Select: lab-1-password-policy-verification
-   ```
-5. **Navigate to the lab directory** in your terminal:
-   ```bash
-   cd /path/to/your/extracted/folder/lab-1-password-policy-verification
-   ```
-
-### Step 2: Create and Activate Virtual Environment
-
-**Why use a virtual environment?**
-Virtual environments isolate Python dependencies, preventing conflicts between different projects and ensuring consistent, reproducible environments.
-
+### 1. Clone the repository
 ```bash
-# Create virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-
-# On Windows:
-# venv\Scripts\activate
-
-# Verify activation (you should see (venv) in your prompt)
-which python
+git clone https://github.com/your-username/password-policy-verification.git
+cd password-policy-verification
 ```
 
-### Step 3: Install Dependencies
-
+### 2. Create and activate a virtual environment
 ```bash
-# Install required packages
+python -m venv venv
+
+# Git Bash / macOS / Linux
+source venv/Scripts/activate   # Windows Git Bash
+source venv/bin/activate       # macOS/Linux
+```
+
+### 3. Install dependencies
+```bash
 pip install boto3
-
-# Verify installation
-pip list
 ```
 
-### Step 4: Configure AWS Authentication
+### 4. Configure AWS credentials
 
-Choose one of the following methods:
-
-#### Option A: AWS SSO/Identity Center (Recommended)
+**Option A — AWS SSO (Identity Center):**
 ```bash
-# Configure SSO
-aws configure sso
-
-# Test connection
-aws sts get-caller-identity --profile your-profile-name
+aws configure sso --profile YourProfileName
+aws sso login --profile YourProfileName
 ```
 
-#### Option B: Traditional AWS CLI
+**Option B — Traditional IAM:**
 ```bash
-# Configure credentials
 aws configure
-
-# Test connection
-aws sts get-caller-identity
 ```
 
-## Required AWS Permissions
+---
 
-Your AWS credentials need the following IAM permissions:
+## 🔑 Required AWS Permissions
+
+Attach this policy to your IAM user or SSO permission set:
 
 ```json
 {
@@ -112,8 +78,11 @@ Your AWS credentials need the following IAM permissions:
             "Effect": "Allow",
             "Action": [
                 "iam:GetAccountPasswordPolicy",
+                "iam:UpdateAccountPasswordPolicy",
                 "iam:ListUsers",
                 "iam:GetLoginProfile",
+                "iam:CreateUser",
+                "iam:CreateLoginProfile",
                 "sso:ListInstances"
             ],
             "Resource": "*"
@@ -122,109 +91,28 @@ Your AWS credentials need the following IAM permissions:
 }
 ```
 
-## Running the Lab
+---
 
-### Basic Usage
+## 🚀 Usage
 
 ```bash
-# Activate virtual environment (if not already active)
-source venv/bin/activate
+# Run with your AWS SSO profile
+python password_policy_checker.py --profile YourProfileName
+
+# Run with a specific region
+python password_policy_checker.py --profile YourProfileName --region us-east-1
 
 # Run with default credentials
 python password_policy_checker.py
-
-# Run with specific AWS profile
-python password_policy_checker.py --profile your-profile-name
-
-# Run with different region
-python password_policy_checker.py --profile your-profile-name --region us-west-2
 ```
 
-### Command Line Options
+---
+
+## 📋 Setting a Compliant Password Policy
+
+Before running the checker, make sure your AWS account has a password policy configured:
 
 ```bash
-python password_policy_checker.py --help
-```
-
-**Available options:**
-- `--profile`: AWS profile name for authentication
-- `--region`: AWS region (default: us-east-1)
-- `--output-dir`: Directory for output files (default: current directory)
-
-## Understanding the Results
-
-### Scenario 1: Identity Center Environment
-
-If your account uses AWS Identity Center (common in enterprise environments):
-
-```
-🔐 Identity Center detected - federated authentication in use
-💡 Password policies are managed in Identity Center, not IAM
-ℹ️  No IAM console users found - IAM password policy not applicable
-```
-
-**Result:** `IDENTITY_CENTER_MANAGED` status with guidance to check Identity Center console.
-
-### Scenario 2: Traditional IAM Environment
-
-If your account uses traditional IAM users:
-
-```
-📋 Retrieving IAM account password policy...
-✅ IAM password policy retrieved successfully
-🔍 Evaluating password policy against compliance standards...
-```
-
-**Result:** Detailed compliance evaluation against SOC 2 and NIST standards.
-
-### Scenario 3: Hybrid Environment
-
-If your account has both Identity Center and IAM console users:
-
-```
-⚠️  Found X IAM console users - hybrid authentication detected
-📋 Retrieving IAM account password policy...
-```
-
-**Result:** Full IAM policy evaluation with Identity Center context noted.
-
-## Generated Reports
-
-The script produces two files:
-
-### 1. JSON Report (`password_policy_compliance_report.json`)
-Detailed technical report including:
-- Complete policy configuration
-- Compliance evaluation results
-- Remediation recommendations
-- Authentication context
-
-### 2. CSV Summary (`password_policy_compliance_summary.csv`)
-Audit-ready summary with:
-- Compliance score and status
-- Control-by-control evaluation
-- Priority-based recommendations
-
-## Testing Different Scenarios
-
-### Test with Identity Center Account (Current Setup)
-```bash
-python password_policy_checker.py --profile Toyeeb
-```
-
-### Create Test IAM User for Full Evaluation
-```bash
-# Create test user with console access
-aws iam create-user --user-name test-console-user --profile Toyeeb
-
-# Create login profile
-aws iam create-login-profile \
-  --user-name test-console-user \
-  --password TempPassword123! \
-  --password-reset-required \
-  --profile Toyeeb
-
-# Create basic password policy
 aws iam update-account-password-policy \
   --minimum-password-length 14 \
   --require-symbols \
@@ -235,119 +123,104 @@ aws iam update-account-password-policy \
   --max-password-age 90 \
   --password-reuse-prevention 24 \
   --no-hard-expiry \
-  --profile Toyeeb
-# Re-run assessment
-python password_policy_checker.py --profile Toyeeb
-
-# Clean up test resources
-aws iam delete-login-profile --user-name test-console-user --profile Toyeeb
-aws iam delete-user --user-name test-console-user --profile Toyeeb
-aws iam delete-account-password-policy --profile Toyeeb
+  --profile YourProfileName
 ```
 
-## Success Criteria
+---
 
-- [ ] Virtual environment created and activated successfully
-- [ ] Dependencies installed without conflicts
-- [ ] Script connects to AWS account successfully
-- [ ] Authentication method (IAM vs Identity Center) detected correctly
-- [ ] Appropriate compliance evaluation performed
-- [ ] Evidence files generated in required formats
-- [ ] Results interpreted correctly for audit purposes
+## 📊 Sample Output
 
-## Troubleshooting
+### Policy Evaluation — 9/9 Controls Compliant
+![Compliance Assessment Output](Verification_1.png)
 
-### Virtual Environment Issues
+### Assessment Summary — 100% Compliant
+![Assessment Summary](Verification_2.png)
+
+---
+
+## 📁 Generated Reports
+
+Each run produces two output files:
+
+| File | Format | Purpose |
+|------|--------|---------|
+| `password_policy_compliance_report.json` | JSON | Detailed technical report for engineers |
+| `password_policy_compliance_summary.csv` | CSV | Audit-ready summary for compliance teams |
+
+---
+
+## 🔍 How It Works
+
+```
+run_assessment()
+      │
+      ├── initialize_aws_session()      → Connect to AWS using profile
+      ├── get_password_policy()         → Fetch IAM password policy
+      │       ├── check_identity_center_usage()   → Detect SSO
+      │       └── check_iam_user_count()          → Count console users
+      ├── evaluate_policy_compliance()  → Compare against standards
+      │       └── _is_control_compliant()         → Per-control logic
+      ├── generate_recommendations()    → Suggest CLI fixes
+      └── save_json_report()
+          save_csv_report()             → Output audit evidence
+```
+
+The key design decision is the **key mapping** — AWS returns policy fields in camelCase (`RequireUppercaseCharacters`) while the compliance standards use snake_case (`require_uppercase`). The script translates between both automatically.
+
+---
+
+## 🧪 Testing Scenarios
+
+### Create a test IAM user
 ```bash
-# If activation fails
-which python
-python -m venv --help
+aws iam create-user --user-name test-console-user --profile YourProfileName
 
-# If pip install fails
-pip install --upgrade pip
-pip install boto3 --verbose
+aws iam create-login-profile \
+  --user-name test-console-user \
+  --password TempPassword123! \
+  --password-reset-required \
+  --profile YourProfileName
 ```
 
-### AWS Authentication Issues
+### Clean up test resources
 ```bash
-# Check AWS configuration
-aws configure list
-aws sts get-caller-identity
-
-# For SSO profiles
-aws sso login --profile your-profile-name
+aws iam delete-login-profile --user-name test-console-user --profile YourProfileName
+aws iam delete-user --user-name test-console-user --profile YourProfileName
 ```
 
-### Permission Issues
-```bash
-# Test specific permissions
-aws iam get-account-password-policy --profile your-profile-name
-aws iam list-users --max-items 1 --profile your-profile-name
-```
+---
 
-### Common Error Messages
+## 🌐 Authentication Scenarios Supported
 
-**"No module named 'boto3'"**
-- Ensure virtual environment is activated
-- Run `pip install boto3`
+| Scenario | Detection | Evaluation |
+|----------|-----------|------------|
+| Traditional IAM only | ✅ Auto-detected | Full IAM policy evaluation |
+| Identity Center (SSO) only | ✅ Auto-detected | Marked as externally managed |
+| Hybrid (both) | ✅ Auto-detected | IAM policy evaluated + SSO noted |
 
-**"Profile not found"**
-- Check profile name: `aws configure list-profiles`
-- Verify SSO login: `aws sso login --profile profile-name`
+---
 
-**"Access denied"**
-- Verify IAM permissions listed above
-- Check if you're using the correct AWS account
-
-## Compliance Interpretation
-
-### For Auditors
-
-**Identity Center Environments:**
-- Password policies managed centrally in Identity Center
-- IAM password policy evaluation not applicable
-- Recommend reviewing Identity Center password policy configuration
-
-**Traditional IAM Environments:**
-- Direct evaluation against SOC 2 CC6.2 and NIST IA-5
-- Specific recommendations for non-compliant controls
-- Ready-to-submit compliance evidence
-
-**Hybrid Environments:**
-- IAM policy applies to console users
-- Identity Center policies apply to federated users
-- Both systems require evaluation
-
-## Next Steps
-
-After completing this lab:
-
-1. **Review Results**: Analyze generated reports with your compliance team
-2. **Implement Recommendations**: Address any identified policy gaps
-3. **Automate Monitoring**: Consider scheduling regular assessments
-4. **Proceed to Lab 2**: Continue with Inactive Key Rotation Check
-5. **Documentation**: Save reports for audit evidence
-
-## Real-World Application
-
-This lab simulates common audit requests:
-- "Please provide evidence of your password policy configuration"
-- "How do you ensure password complexity requirements are enforced?"
-- "Demonstrate compliance with SOC 2 CC6.2 password controls"
-
-The generated reports can be directly submitted to auditors as compliance evidence, with the script's intelligence ensuring appropriate evaluation based on your authentication architecture.
-
-## Cleanup
-
-When finished with the lab:
+## 🧹 Cleanup
 
 ```bash
 # Deactivate virtual environment
 deactivate
 
-# Optional: Remove virtual environment
-rm -rf venv
-
-# Keep generated reports for audit evidence
+# Keep reports for audit evidence
 ls *.json *.csv
 ```
+
+---
+
+## 📚 Lessons Learned
+
+- AWS IAM Identity Center and traditional IAM require different compliance approaches
+- The AWS API returns camelCase keys — always map them to your internal standard before comparing
+- SSO permission sets must be **re-provisioned/updated** after policy changes for CLI sessions to reflect updates
+- 
+---
+
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute.
