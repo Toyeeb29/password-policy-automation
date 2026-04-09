@@ -207,17 +207,6 @@ The key design decision is the **key mapping** — AWS returns policy fields in 
 
 ---
 
-## 🧹 Cleanup
-
-```bash
-# Deactivate virtual environment
-deactivate
-
-# Keep reports for audit evidence
-ls *.json *.csv
-```
-
----
 
 ## 📚 Lessons Learned
 
