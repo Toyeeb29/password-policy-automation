@@ -138,6 +138,35 @@ aws iam update-account-password-policy \
 
 ---
 
+## 📋 Testing a Non-Compliant Password Policy
+
+Before running the checker, make sure your AWS account has a password policy configured:
+
+```bash
+aws iam update-account-password-policy \
+  --minimum-password-length 6 \
+  --no-require-symbols \
+  --no-require-numbers \
+  --no-require-uppercase-characters \
+  --no-require-lowercase-characters \
+  --allow-users-to-change-password \
+  --max-password-age 365 \
+  --password-reuse-prevention 1 \
+  --no-hard-expiry \
+  --profile Toyeeb
+```
+# Run the checker
+```python password_policy_checker.py --profile Toyeeb
+```
+---
+## Sample non-compliance output
+<img width="593" height="320" alt="nc 1" src="https://github.com/user-attachments/assets/eb647729-060b-4104-95dc-0666c731ed90" />
+
+<img width="613" height="147" alt="nc 2" src="https://github.com/user-attachments/assets/2b55bdc5-3561-474d-853b-b6d9aff951a6" />
+
+
+
+
 ## 📁 Generated Reports
 
 Each run produces two output files:
@@ -146,6 +175,9 @@ Each run produces two output files:
 |------|--------|---------|
 | `password_policy_compliance_report.json` | JSON | Detailed technical report for engineers |
 | `password_policy_compliance_summary.csv` | CSV | Audit-ready summary for compliance teams |
+
+| `password_policy_non-compliance_report.json` | JSON | Detailed technical report for engineers |
+| `password_policy_non-compliance_summary.csv` | CSV | Audit-ready summary for compliance teams |
 
 ---
 
