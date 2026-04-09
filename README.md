@@ -130,12 +130,11 @@ aws iam update-account-password-policy \
 ## 📊 Sample Output
 
 ### Policy Evaluation — 9/9 Controls Compliant
-![Compliance Assessment Output](<img width="578" height="383" alt="Verification 1" src="https://github.com/user-attachments/assets/63e2b77a-039f-4d52-bf9b-e1665b4b8224" />
-)
+<img width="578" height="383" alt="Verification 1" src="https://github.com/user-attachments/assets/8333f82e-cceb-4bf4-85ce-7398aef14591" />
+
 
 ### Assessment Summary — 100% Compliant
-![Assessment Summary](<img width="541" height="227" alt="Verification 2" src="https://github.com/user-attachments/assets/e8d3f65c-f1de-4bc9-addf-2491fa85628e" />
-)
+<img width="541" height="227" alt="Verification 2" src="https://github.com/user-attachments/assets/9e274121-59d0-438e-8c85-4884e28dc8f4" />
 
 ---
 
