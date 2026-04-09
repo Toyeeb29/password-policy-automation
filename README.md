@@ -33,8 +33,7 @@ This tool connects to your AWS account, retrieves your IAM password policy, and 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/password-policy-verification.git
-cd password-policy-verification
+git clone https://github.com/Toyeeb29/password-policy-automation.git
 ```
 
 ### 2. Create and activate a virtual environment
@@ -131,10 +130,12 @@ aws iam update-account-password-policy \
 ## 📊 Sample Output
 
 ### Policy Evaluation — 9/9 Controls Compliant
-![Compliance Assessment Output](Verification_1.png)
+![Compliance Assessment Output](<img width="578" height="383" alt="Verification 1" src="https://github.com/user-attachments/assets/63e2b77a-039f-4d52-bf9b-e1665b4b8224" />
+)
 
 ### Assessment Summary — 100% Compliant
-![Assessment Summary](Verification_2.png)
+![Assessment Summary](<img width="541" height="227" alt="Verification 2" src="https://github.com/user-attachments/assets/e8d3f65c-f1de-4bc9-addf-2491fa85628e" />
+)
 
 ---
 
@@ -160,7 +161,7 @@ run_assessment()
       │       └── check_iam_user_count()          → Count console users
       ├── evaluate_policy_compliance()  → Compare against standards
       │       └── _is_control_compliant()         → Per-control logic
-      ├── generate_recommendations()    → Suggest CLI fixes
+      ├── generate_recommendations()    
       └── save_json_report()
           save_csv_report()             → Output audit evidence
 ```
@@ -169,26 +170,6 @@ The key design decision is the **key mapping** — AWS returns policy fields in 
 
 ---
 
-## 🧪 Testing Scenarios
-
-### Create a test IAM user
-```bash
-aws iam create-user --user-name test-console-user --profile YourProfileName
-
-aws iam create-login-profile \
-  --user-name test-console-user \
-  --password TempPassword123! \
-  --password-reset-required \
-  --profile YourProfileName
-```
-
-### Clean up test resources
-```bash
-aws iam delete-login-profile --user-name test-console-user --profile YourProfileName
-aws iam delete-user --user-name test-console-user --profile YourProfileName
-```
-
----
 
 ## 🌐 Authentication Scenarios Supported
 
