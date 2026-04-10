@@ -21,7 +21,7 @@ This tool connects to your AWS account, retrieves your IAM password policy, and 
 
 ## 🛠️ Tech Stack
 
-- **Python 3.9+**
+- **Python 3.11+**
 - **boto3** – AWS SDK for Python
 - **AWS IAM** – Password policy evaluation
 - **AWS IAM Identity Center** – SSO detection
